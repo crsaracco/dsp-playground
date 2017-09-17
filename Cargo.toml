@@ -1,0 +1,7 @@
+[package]
+name = "dsp-playground"
+version = "0.1.0"
+authors = ["Charles Saracco <crsaracco@gmail.com>"]
+
+[dependencies]
+portaudio = "*"
