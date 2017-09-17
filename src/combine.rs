@@ -1,34 +1,31 @@
 use evaluatable::Evaluatable;
 
-pub struct Combine<F, S>
-    where
-        F: Evaluatable,
-        S: Evaluatable,
+pub struct Combine<E>
+    where E: Evaluatable
 {
-    first: F,
-    second: S,
+    combined: Vec<E>,
 }
 
-impl<F, S> Combine<F, S>
-    where
-        F: Evaluatable,
-        S: Evaluatable,
+impl<E> Combine<E>
+    where E: Evaluatable
 {
-    pub fn new(first: F, second: S) -> Combine<F, S> {
-        Combine {first, second}
+    pub fn new(combined: Vec<E>) -> Combine<E> {
+        Combine {combined}
     }
 }
 
-impl<F, S> Evaluatable for Combine<F, S>
-    where
-        F: Evaluatable,
-        S: Evaluatable,
+impl<E> Evaluatable for Combine<E>
+    where E: Evaluatable
 {
     fn evaluate(&mut self) -> (f32, f32) {
-        let first_output = self.first.evaluate();
-        let second_output = self.second.evaluate();
+        let mut left: f32 = 0.0;
+        let mut right: f32 = 0.0;
+        for c in &mut self.combined {
+            let output = c.evaluate();
+            left += output.0;
+            right += output.1;
+        }
 
-
-        (first_output.0 + second_output.0, first_output.1 + second_output.1)
+        (left, right)
     }
 }

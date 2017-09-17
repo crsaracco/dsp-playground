@@ -25,9 +25,10 @@ fn main() {
     let sine_generator2 = SineGenerator::new(44100.0, 500.0, 0.3);
     let sine_generator3 = SineGenerator::new(44100.0, 600.0, 0.3);
 
-    let combine1 = Combine::new(sine_generator1, sine_generator2);
-    let combine2 = Combine::new(combine1, sine_generator3);
-    run(combine2).unwrap()
+    let mut combine_vec = vec![sine_generator1, sine_generator2, sine_generator3];
+
+    let combine = Combine::new(combine_vec);
+    run(combine).unwrap()
 }
 
 
