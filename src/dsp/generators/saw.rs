@@ -1,6 +1,8 @@
+//! Saw wave signal generator.
+
 use dsp::evaluatable::Evaluatable;
 
-// Saw wave generator
+/// Saw wave generator struct.
 pub struct Saw {
     sample_rate: f64,
     frequency: f64,
@@ -9,6 +11,7 @@ pub struct Saw {
 }
 
 impl Saw {
+    /// Creates a new Saw wave signal generator.
     pub fn new(sample_rate: f64, frequency: f64, amplitude: f64) -> Saw {
         Saw { sample_rate, frequency, amplitude, output: 0.0}
     }

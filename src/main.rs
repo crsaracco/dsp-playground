@@ -1,4 +1,6 @@
-// TODO: #![deny(missing_docs)]
+#![deny(missing_docs)]
+
+//! Main driver application for the "dsp" library.
 
 // PortAudio:
 extern crate portaudio;

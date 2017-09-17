@@ -1,5 +1,8 @@
+//! Signal that negates the passed-in signal argument
+
 use dsp::evaluatable::Evaluatable;
 
+/// NegateSignal struct
 pub struct NegateSignal<E>
     where E: Evaluatable
 {
@@ -9,6 +12,7 @@ pub struct NegateSignal<E>
 impl<E> NegateSignal<E>
     where E: Evaluatable
 {
+    /// Creates a new NegateSignal signal
     pub fn new(negated: E) -> NegateSignal<E> {
         NegateSignal {negated}
     }

@@ -1,7 +1,9 @@
+//! Sine wave signal generator
+
 use dsp::evaluatable::Evaluatable;
 use std::f64;
 
-// Sine wave generator
+/// Sine wave generator struct.
 pub struct Sine {
     sample_rate: f64,
     frequency: f64,
@@ -10,6 +12,7 @@ pub struct Sine {
 }
 
 impl Sine {
+    /// Creates a new Sine wave signal generator.
     pub fn new(sample_rate: f64, frequency: f64, amplitude: f64) -> Sine {
         Sine { sample_rate, frequency, amplitude, sample_number: 0}
     }

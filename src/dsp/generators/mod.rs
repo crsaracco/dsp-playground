@@ -1,3 +1,5 @@
+//! Signal generators.
+
 // Sine wave generator
 pub mod sine;
 pub use self::sine::Sine;
