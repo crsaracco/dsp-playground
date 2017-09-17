@@ -7,7 +7,7 @@ use portaudio as pa;
 // DSP module
 // TODO: remove all these "use" statements in favor of explicitly calling them in main.rs
 pub mod dsp;
-use dsp::sine_generator::SineGenerator;
+use dsp::generators;
 use dsp::negate_signal::NegateSignal;
 use dsp::add_signals::AddSignals;
 use dsp::evaluatable::Evaluatable;
@@ -17,19 +17,16 @@ const NUM_CHANNELS: i32 = 2;
 const NUM_SECONDS: i32 = 5;
 const SAMPLE_RATE: f64 = 44100.0;
 const FRAMES_PER_BUFFER: u32 = 64;
-const BUFFER_SECONDS: f64 = 0.050;  // Buffer samples for 50ms -- reduces chances of underrun
+const BUFFER_SECONDS: f64 = 0.100;  // Buffer samples for 100ms -- reduces chances of underrun
 
 
 fn main() {
     // Create input sound generators:
-    let sine_generator1 = SineGenerator::new(44100.0, 400.0, 0.3);
-    let sine_generator2 = SineGenerator::new(44100.0, 400.0, 0.3);
+    let saw_generator1 = generators::Saw::new(44100.0, 100.0*3.0, 0.1);
+    let saw_generator2 = generators::Saw::new(44100.0, 120.0*3.0, 0.1);
+    let saw_generator3 = generators::Saw::new(44100.0, 150.0*3.0, 0.1);
 
-    // Negate one of the sine waves:
-    let negated_sine_2 = NegateSignal::new(sine_generator2);
-
-    // Add sound generators together -- result should be silence:
-    let add_vec: Vec<Box<Evaluatable>> = vec![Box::new(sine_generator1), Box::new(negated_sine_2)];
+    let add_vec: Vec<Box<Evaluatable>> = vec![Box::new(saw_generator1), Box::new(saw_generator2), Box::new(saw_generator3)];
     let add_signals = AddSignals::new(add_vec);
 
     // Play our resulting audio:
