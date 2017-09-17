@@ -2,21 +2,13 @@
 extern crate portaudio;
 use portaudio as pa;
 
-// Evaluatable trait:
-pub mod evaluatable;
-use evaluatable::Evaluatable;
-
-// Sine generator:
-pub mod sine_generator;
-use sine_generator::SineGenerator;
-
-// AddSignals:
-pub mod add_signals;
-use add_signals::AddSignals;
-
-// NegatedSignal:
-pub mod negate_signal;
-use negate_signal::NegateSignal;
+// DSP module
+// TODO: remove all these "use" statements in favor of explicitly calling them in main.rs
+pub mod dsp;
+use dsp::sine_generator::SineGenerator;
+use dsp::negate_signal::NegateSignal;
+use dsp::add_signals::AddSignals;
+use dsp::evaluatable::Evaluatable;
 
 // Constants:
 const CHANNELS: i32 = 2;

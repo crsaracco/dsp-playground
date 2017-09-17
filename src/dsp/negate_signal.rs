@@ -1,4 +1,4 @@
-use evaluatable::Evaluatable;
+use dsp::evaluatable::Evaluatable;
 
 pub struct NegateSignal<E>
     where E: Evaluatable

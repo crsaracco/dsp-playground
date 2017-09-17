@@ -1,4 +1,4 @@
-use evaluatable::Evaluatable;
+use dsp::evaluatable::Evaluatable;
 
 use std::f64;
 

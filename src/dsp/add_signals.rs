@@ -1,4 +1,4 @@
-use evaluatable::Evaluatable;
+use dsp::evaluatable::Evaluatable;
 
 pub struct AddSignals {
     added: Vec<Box<Evaluatable>>,
