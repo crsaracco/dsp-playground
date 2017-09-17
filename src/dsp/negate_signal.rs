@@ -3,24 +3,18 @@
 use dsp::evaluatable::Evaluatable;
 
 /// NegateSignal struct
-pub struct NegateSignal<E>
-    where E: Evaluatable
-{
-    negated: E,
+pub struct NegateSignal {
+    negated: Box<Evaluatable>,
 }
 
-impl<E> NegateSignal<E>
-    where E: Evaluatable
-{
+impl NegateSignal {
     /// Creates a new NegateSignal signal
-    pub fn new(negated: E) -> NegateSignal<E> {
+    pub fn new(negated: Box<Evaluatable>) -> NegateSignal {
         NegateSignal {negated}
     }
 }
 
-impl<E> Evaluatable for NegateSignal<E>
-    where E: Evaluatable
-{
+impl Evaluatable for NegateSignal {
     fn evaluate(&mut self) -> (f32, f32) {
         let (left, right) = self.negated.evaluate();
 
