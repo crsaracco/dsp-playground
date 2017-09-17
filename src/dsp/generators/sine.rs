@@ -1,4 +1,14 @@
 //! Sine wave signal generator
+//!
+//! The sine wave can be considered a "basic waveform", since it has a pretty simple relationship
+//! between the harmonics and the fundamental (in this case, there are no harmonics; only the
+//! fundamental).
+//!
+//! The sine wave is the basic building block of sound: any sound can be constructed by adding
+//! multiple sine waves together with varying frequencies and amplitudes.
+//!
+//! In the frequency domain, a sine wave represents a "pure tone". It consists of only one
+//! frequency: the frequency of the sine wave itself.
 
 use dsp::evaluatable::Evaluatable;
 use std::f64;
@@ -8,6 +18,11 @@ pub struct Sine {
     sample_rate: f64,
     frequency: f64,
     amplitude: f64,
+    /* TODO: *Technically*, using a u64 like this will not allow us to generate this waveform
+     * indefinitely, although realistically speaking it will last for ~13 million years (assuming
+     * a sample rate of 44100). Nevertheless, try to come up with a different method of keeping
+     * track of where you are in the sine wave that doesn't introduce aliasing.
+     */
     sample_number: u64,
 }
 

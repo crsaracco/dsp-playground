@@ -24,17 +24,17 @@ const BUFFER_SECONDS: f64 = 0.100;  // Buffer samples for 100ms -- reduces chanc
 
 fn main() {
     // Create input sound generators:
-    let saw_generator1 = generators::Saw::new(44100.0, 100.0*3.0, 0.1);
-    let saw_generator2 = generators::Saw::new(44100.0, 100.0*3.0, 0.1);
+    let square_generator = generators::Square::new(44100.0, 440.0, 0.1);
+    //let saw_generator2 = generators::Saw::new(44100.0, 120.0*3.0, 0.1);
     //let saw_generator3 = generators::Saw::new(44100.0, 150.0*3.0, 0.1);
 
-    let negate_signal = NegateSignal::new(Box::new(saw_generator2));
+    //let negate_signal = NegateSignal::new(Box::new(saw_generator2));
 
-    let add_vec: Vec<Box<Evaluatable>> = vec![Box::new(saw_generator1), Box::new(negate_signal)];
-    let add_signals = AddSignals::new(add_vec);
+    //let add_vec: Vec<Box<Evaluatable>> = vec![Box::new(saw_generator1), Box::new(saw_generator2), Box::new(saw_generator3)];
+    //let add_signals = AddSignals::new(add_vec);
 
     // Play our resulting audio:
-    run(add_signals).unwrap()
+    run(square_generator).unwrap()
 }
 
 
