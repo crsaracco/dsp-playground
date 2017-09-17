@@ -10,9 +10,9 @@ use evaluatable::Evaluatable;
 pub mod sine_generator;
 use sine_generator::SineGenerator;
 
-// Combine:
-pub mod combine;
-use combine::Combine;
+// AddSignals:
+pub mod add_signals;
+use add_signals::AddSignals;
 
 // Constants:
 const CHANNELS: i32 = 2;
@@ -25,10 +25,10 @@ fn main() {
     let sine_generator2 = SineGenerator::new(44100.0, 500.0, 0.3);
     let sine_generator3 = SineGenerator::new(44100.0, 600.0, 0.3);
 
-    let mut combine_vec = vec![sine_generator1, sine_generator2, sine_generator3];
+    let mut add_vec = vec![sine_generator1, sine_generator2, sine_generator3];
 
-    let combine = Combine::new(combine_vec);
-    run(combine).unwrap()
+    let add_signals = AddSignals::new(add_vec);
+    run(add_signals).unwrap()
 }
 
 

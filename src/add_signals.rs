@@ -1,26 +1,26 @@
 use evaluatable::Evaluatable;
 
-pub struct Combine<E>
+pub struct AddSignals<E>
     where E: Evaluatable
 {
-    combined: Vec<E>,
+    added: Vec<E>,
 }
 
-impl<E> Combine<E>
+impl<E> AddSignals<E>
     where E: Evaluatable
 {
-    pub fn new(combined: Vec<E>) -> Combine<E> {
-        Combine {combined}
+    pub fn new(added: Vec<E>) -> AddSignals<E> {
+        AddSignals {added}
     }
 }
 
-impl<E> Evaluatable for Combine<E>
+impl<E> Evaluatable for AddSignals<E>
     where E: Evaluatable
 {
     fn evaluate(&mut self) -> (f32, f32) {
         let mut left: f32 = 0.0;
         let mut right: f32 = 0.0;
-        for c in &mut self.combined {
+        for c in &mut self.added {
             let output = c.evaluate();
             left += output.0;
             right += output.1;
