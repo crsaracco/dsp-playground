@@ -14,6 +14,10 @@ use sine_generator::SineGenerator;
 pub mod add_signals;
 use add_signals::AddSignals;
 
+// NegatedSignal:
+pub mod negate_signal;
+use negate_signal::NegateSignal;
+
 // Constants:
 const CHANNELS: i32 = 2;
 const NUM_SECONDS: i32 = 5;
@@ -22,10 +26,12 @@ const FRAMES_PER_BUFFER: u32 = 64;
 
 fn main() {
     let sine_generator1 = SineGenerator::new(44100.0, 400.0, 0.3);
-    let sine_generator2 = SineGenerator::new(44100.0, 500.0, 0.3);
-    let sine_generator3 = SineGenerator::new(44100.0, 600.0, 0.3);
+    let sine_generator2 = SineGenerator::new(44100.0, 400.0, 0.3);
+    let negated_sine_2 = NegateSignal::new(sine_generator2);
 
-    let mut add_vec = vec![sine_generator1, sine_generator2, sine_generator3];
+    //let mut add_vec = vec![sine_generator1, sine_generator2];
+
+    let add_vec: Vec<Box<Evaluatable>> = vec![Box::new(sine_generator1), Box::new(negated_sine_2)];
 
     let add_signals = AddSignals::new(add_vec);
     run(add_signals).unwrap()

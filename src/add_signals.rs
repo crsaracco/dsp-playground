@@ -1,22 +1,16 @@
 use evaluatable::Evaluatable;
 
-pub struct AddSignals<E>
-    where E: Evaluatable
-{
-    added: Vec<E>,
+pub struct AddSignals {
+    added: Vec<Box<Evaluatable>>,
 }
 
-impl<E> AddSignals<E>
-    where E: Evaluatable
-{
-    pub fn new(added: Vec<E>) -> AddSignals<E> {
+impl AddSignals {
+    pub fn new(added: Vec<Box<Evaluatable>>) -> AddSignals {
         AddSignals {added}
     }
 }
 
-impl<E> Evaluatable for AddSignals<E>
-    where E: Evaluatable
-{
+impl Evaluatable for AddSignals {
     fn evaluate(&mut self) -> (f32, f32) {
         let mut left: f32 = 0.0;
         let mut right: f32 = 0.0;
