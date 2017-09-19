@@ -21,8 +21,7 @@ use dsp::negate_signal::NegateSignal;
 use dsp::add_signals::AddSignals;
 
 // Traits:
-use dsp::traits::Evaluatable;
-
+use dsp::traits::Signal;
 
 // Constants:
 const NUM_CHANNELS: i32 = 2;
@@ -60,8 +59,9 @@ fn main() {
         let sine_gen1 = generators::Square::new(SAMPLE_RATE, 2.0, 200.0);
         let sine_gen2 = generators::Square::new(SAMPLE_RATE, 2.0 * 1.2, 200.0);
         let sine_gen3 = generators::Square::new(SAMPLE_RATE, 2.0 * 1.5, 200.0);
-        let add_vec: Vec<Box<Evaluatable>> = vec![Box::new(sine_gen1), Box::new(sine_gen2), Box::new(sine_gen3)];
+        let add_vec: Vec<Box<Signal>> = vec![Box::new(sine_gen1), Box::new(sine_gen2), Box::new(sine_gen3)];
         let add_signals = AddSignals::new(add_vec);
+
         let mut parametric_sine_gen = generators::parametric::Sine::new(SAMPLE_RATE, add_signals, 0.3);
         loop {
             send_audio.send(parametric_sine_gen.evaluate());
@@ -83,8 +83,8 @@ fn main() {
 
         for i in 0..((period*50.0) as usize) {
             let sample = recv_points.recv().unwrap();
-            x.push(i as f32);
-            y.push(sample.0);
+            x.push(i as f64);
+            y.push(sample);
         }
 
         // TODO: all we need is a plotting library to plot here...
@@ -102,7 +102,7 @@ fn main() {
 }
 
 
-fn run(recv_audio: chan::Receiver<(f32, f32)>, send_points: chan::Sender<(f32, f32)>) -> Result<(), pa::Error> {
+fn run(recv_audio: chan::Receiver<f64>, send_points: chan::Sender<f64>) -> Result<(), pa::Error> {
     // Fire up ye olde PortAudio:
     println!("=============");
     let pa = try!(pa::PortAudio::new());
@@ -125,10 +125,10 @@ fn run(recv_audio: chan::Receiver<(f32, f32)>, send_points: chan::Sender<(f32, f
     let callback = move |pa::OutputStreamCallbackArgs { buffer, frames, .. }| {
         let mut i = 0;
         for _ in 0..frames {
-            let samples = recv_audio.recv().unwrap();
-            send_points.send(samples.clone());
-            buffer[i]   = samples.0;
-            buffer[i+1] = samples.1;
+            let sample = recv_audio.recv().unwrap();
+            send_points.send(sample.clone());
+            buffer[i]   = sample as f32;
+            buffer[i+1] = sample as f32;
             i += 2;
         }
         pa::Continue

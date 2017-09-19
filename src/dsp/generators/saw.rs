@@ -24,13 +24,14 @@
 //! time domain, which does not take into account the Nyquist frequency and does not band-limit
 //! higher frequencies, so this implementation *might* include aliasing distortion. (???)
 
-use dsp::traits::Evaluatable;
+use dsp::traits::Signal;
 
 /// Saw wave generator struct.
 pub struct Saw {
     sample_rate: f64,
     frequency: f64,
     amplitude: f64,
+    // TODO: Rename to "phase" to reduce confusion; rename "current_output" below to "output"
     output: f64,
 }
 
@@ -41,8 +42,8 @@ impl Saw {
     }
 }
 
-impl Evaluatable for Saw {
-    fn evaluate(&mut self) -> (f32, f32) {
+impl Signal for Saw {
+    fn evaluate(&mut self) -> (f64) {
         let mut current_output = self.output;
 
         self.output += self.frequency / self.sample_rate as f64;
@@ -51,6 +52,6 @@ impl Evaluatable for Saw {
         }
 
         current_output *= self.amplitude;
-        (current_output as f32, current_output as f32)
+        current_output
     }
 }

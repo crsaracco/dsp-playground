@@ -10,7 +10,7 @@
 //! In the frequency domain, a sine wave represents a "pure tone". It consists of only one
 //! frequency: the frequency of the sine wave itself.
 
-use dsp::traits::Evaluatable;
+use dsp::traits::Signal;
 use std::f64;
 
 /// Sine wave generator struct.
@@ -28,12 +28,12 @@ impl Sine {
     }
 }
 
-impl Evaluatable for Sine {
-    fn evaluate(&mut self) -> (f32, f32) {
+impl Signal for Sine {
+    fn evaluate(&mut self) -> (f64) {
         let mut output = (2.0 * f64::consts::PI * (self.phase)).sin();
         self.phase += (self.frequency / self.sample_rate).fract();
 
         output *= self.amplitude;
-        (output as f32, output as f32)
+        output
     }
 }

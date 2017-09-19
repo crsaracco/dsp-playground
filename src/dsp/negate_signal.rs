@@ -1,23 +1,21 @@
 //! Signal that negates the passed-in signal argument
 
-use dsp::traits::Evaluatable;
+use dsp::traits::Signal;
 
 /// NegateSignal struct
 pub struct NegateSignal {
-    negated: Box<Evaluatable>,
+    negated: Box<Signal>,
 }
 
 impl NegateSignal {
     /// Creates a new NegateSignal signal
-    pub fn new(negated: Box<Evaluatable>) -> NegateSignal {
+    pub fn new(negated: Box<Signal>) -> NegateSignal {
         NegateSignal {negated}
     }
 }
 
-impl Evaluatable for NegateSignal {
-    fn evaluate(&mut self) -> (f32, f32) {
-        let (left, right) = self.negated.evaluate();
-
-        (-left, -right)
+impl Signal for NegateSignal {
+    fn evaluate(&mut self) -> f64 {
+        -1.0 * self.negated.evaluate()
     }
 }

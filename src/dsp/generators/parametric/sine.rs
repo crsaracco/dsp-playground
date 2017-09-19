@@ -1,11 +1,11 @@
 //! Parametric sine wave signal generator
 
-use dsp::traits::Evaluatable;
+use dsp::traits::Signal;
 use std::f64;
 
 /// Parametric sine wave generator struct.
 pub struct Sine<F>
-    where F: Evaluatable
+    where F: Signal
 {
     sample_rate: f64,
     frequency: F,
@@ -14,7 +14,7 @@ pub struct Sine<F>
 }
 
 impl<F> Sine<F>
-    where F: Evaluatable
+    where F: Signal
 {
     /// Creates a new parametric sine wave signal generator.
     pub fn new(sample_rate: f64, frequency: F, amplitude: f64) -> Sine<F> {
@@ -22,15 +22,15 @@ impl<F> Sine<F>
     }
 }
 
-impl<F> Evaluatable for Sine<F>
-    where F: Evaluatable
+impl<F> Signal for Sine<F>
+    where F: Signal
 {
-    fn evaluate(&mut self) -> (f32, f32) {
+    fn evaluate(&mut self) -> f64 {
         let mut output = (2.0 * f64::consts::PI * (self.phase)).sin();
         // TODO: make DC offset an argument to new() for all generators so we don't have to hardcode a frequency here
-        self.phase += ((self.frequency.evaluate().0 + 1000.0) as f64 / self.sample_rate).fract();
+        self.phase += ((self.frequency.evaluate() + 1000.0) as f64 / self.sample_rate).fract();
 
         output *= self.amplitude;
-        (output as f32, output as f32)
+        output
     }
 }

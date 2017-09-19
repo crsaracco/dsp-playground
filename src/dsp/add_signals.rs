@@ -1,29 +1,27 @@
 //! Signal that takes multiple other signals and adds them together
 
-use dsp::traits::Evaluatable;
+use dsp::traits::Signal;
 
 /// AddSignals struct
 pub struct AddSignals {
-    added: Vec<Box<Evaluatable>>,
+    added: Vec<Box<Signal>>,
 }
 
 impl AddSignals {
     /// Creates a new AddSignals signal
-    pub fn new(added: Vec<Box<Evaluatable>>) -> AddSignals {
+    pub fn new(added: Vec<Box<Signal>>) -> AddSignals {
         AddSignals {added}
     }
 }
 
-impl Evaluatable for AddSignals {
-    fn evaluate(&mut self) -> (f32, f32) {
-        let mut left: f32 = 0.0;
-        let mut right: f32 = 0.0;
+impl Signal for AddSignals {
+    fn evaluate(&mut self) -> f64 {
+        let mut output: f64 = 0.0;
+
         for c in &mut self.added {
-            let output = c.evaluate();
-            left += output.0;
-            right += output.1;
+            output += c.evaluate();
         }
 
-        (left, right)
+        output
     }
 }
