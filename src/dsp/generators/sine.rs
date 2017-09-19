@@ -18,25 +18,20 @@ pub struct Sine {
     sample_rate: f64,
     frequency: f64,
     amplitude: f64,
-    /* TODO: *Technically*, using a u64 like this will not allow us to generate this waveform
-     * indefinitely, although realistically speaking it will last for ~13 million years (assuming
-     * a sample rate of 44100). Nevertheless, try to come up with a different method of keeping
-     * track of where you are in the sine wave that doesn't introduce aliasing.
-     */
-    sample_number: u64,
+    phase: f64,
 }
 
 impl Sine {
     /// Creates a new Sine wave signal generator.
     pub fn new(sample_rate: f64, frequency: f64, amplitude: f64) -> Sine {
-        Sine { sample_rate, frequency, amplitude, sample_number: 0}
+        Sine { sample_rate, frequency, amplitude, phase: 0.0}
     }
 }
 
 impl Evaluatable for Sine {
     fn evaluate(&mut self) -> (f32, f32) {
-        let mut output = (2.0 * f64::consts::PI * (self.frequency / self.sample_rate as f64) * (self.sample_number as f64)).sin();
-        self.sample_number += 1;
+        let mut output = (2.0 * f64::consts::PI * (self.phase)).sin();
+        self.phase += (self.frequency / self.sample_rate).fract();
 
         output *= self.amplitude;
         (output as f32, output as f32)
