@@ -54,7 +54,6 @@ impl Evaluatable for Square {
         }
 
         output *= self.amplitude;
-        println!("{}", output);
         (output as f32, output as f32)
     }
 }

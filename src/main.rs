@@ -6,6 +6,13 @@
 extern crate portaudio;
 use portaudio as pa;
 
+// Channels for buffering up samples in between threads:
+extern crate chan;
+
+// other `use` statements:
+use std::thread;
+use std::time;
+
 // DSP module
 // TODO: remove all these "use" statements in favor of explicitly calling them in main.rs
 pub mod dsp;
@@ -14,33 +21,82 @@ use dsp::negate_signal::NegateSignal;
 use dsp::add_signals::AddSignals;
 use dsp::evaluatable::Evaluatable;
 
+
 // Constants:
 const NUM_CHANNELS: i32 = 2;
-const NUM_SECONDS: i32 = 5;
 const SAMPLE_RATE: f64 = 44100.0;
-const FRAMES_PER_BUFFER: u32 = 64;
+const FRAMES_PER_BUFFER: u32 = 1024;
 const BUFFER_SECONDS: f64 = 0.100;  // Buffer samples for 100ms -- reduces chances of underrun
-
+const FREQUENCY: f64 = 440.0;
 
 fn main() {
-    // Create input sound generators:
-    let square_generator = generators::Square::new(44100.0, 440.0, 0.1);
-    //let saw_generator2 = generators::Saw::new(44100.0, 120.0*3.0, 0.1);
-    //let saw_generator3 = generators::Saw::new(44100.0, 150.0*3.0, 0.1);
+    // Collect all our threads:
+    let mut children = vec![];
 
-    //let negate_signal = NegateSignal::new(Box::new(saw_generator2));
+    // Signal flow:
+    // (signal generators + filters + combinations) --> (portaudio) --> (grapher - first 1000 samples)
 
-    //let add_vec: Vec<Box<Evaluatable>> = vec![Box::new(saw_generator1), Box::new(saw_generator2), Box::new(saw_generator3)];
-    //let add_signals = AddSignals::new(add_vec);
+    // Create a channel for (signals) --> (portaudio)
+    let (send_audio, recv_audio) = chan::sync(SAMPLE_RATE as usize);
 
-    // Play our resulting audio:
-    run(square_generator).unwrap()
+    // Create a channel for (portaudio) --> (grapher)
+    let (send_points, recv_points) = chan::sync(SAMPLE_RATE as usize);
+
+    // TODO: maybe split this out into different functions / modules
+
+    // signal generators:
+    children.push(thread::spawn(move || {
+        // A-Minor chord
+        let sine_generator1 = generators::Sine::new(SAMPLE_RATE, FREQUENCY * 1.0, 0.1);
+        let sine_generator2 = generators::Sine::new(SAMPLE_RATE, FREQUENCY * 1.2 * 0.5, 0.1);
+        let sine_generator3 = generators::Sine::new(SAMPLE_RATE, FREQUENCY * 1.5 * 0.5, 0.1);
+        let add_vec: Vec<Box<Evaluatable>> = vec![Box::new(sine_generator1), Box::new(sine_generator2), Box::new(sine_generator3)];
+
+        let mut add_signals = AddSignals::new(add_vec);
+        loop {
+            send_audio.send(add_signals.evaluate());
+        }
+    }));
+
+    // PortAudio:
+    children.push(thread::spawn(move || {
+        thread::sleep(time::Duration::new(0, 1_000_000));
+        run(recv_audio, send_points).unwrap()
+    }));
+
+    // Grapher:
+    children.push(thread::spawn(move || {
+        let mut x = vec![];
+        let mut y = vec![];
+
+        let period = SAMPLE_RATE / FREQUENCY;
+
+        for i in 0..((period*50.0) as usize) {
+            let sample = recv_points.recv().unwrap();
+            x.push(i as f32);
+            y.push(sample.0);
+        }
+
+        // TODO: all we need is a plotting library to plot here...
+
+        // TODO: Just close the channel instead of constantly recv-ing here
+        loop {
+            recv_points.recv();
+        }
+    }));
+
+    // Wait for all the child threads to finish:
+    for child in children {
+        let _ = child.join();
+    }
 }
 
 
-fn run<E: Evaluatable + 'static>(mut generator: E) -> Result<(), pa::Error> {
+fn run(recv_audio: chan::Receiver<(f32, f32)>, send_points: chan::Sender<(f32, f32)>) -> Result<(), pa::Error> {
     // Fire up ye olde PortAudio:
+    println!("=============");
     let pa = try!(pa::PortAudio::new());
+    println!("=============");
 
     // Set up our settings - set a buffer amount to try to reduce underruns:
     let mut settings = try!(pa.default_output_stream_settings(NUM_CHANNELS, SAMPLE_RATE, FRAMES_PER_BUFFER));
@@ -59,7 +115,8 @@ fn run<E: Evaluatable + 'static>(mut generator: E) -> Result<(), pa::Error> {
     let callback = move |pa::OutputStreamCallbackArgs { buffer, frames, .. }| {
         let mut i = 0;
         for _ in 0..frames {
-            let samples = generator.evaluate();
+            let samples = recv_audio.recv().unwrap();
+            send_points.send(samples.clone());
             buffer[i]   = samples.0;
             buffer[i+1] = samples.1;
             i += 2;
@@ -75,11 +132,10 @@ fn run<E: Evaluatable + 'static>(mut generator: E) -> Result<(), pa::Error> {
     try!(stream.start());
 
     // We're using PortAudio in non-blocking mode, so execution will fall through immedately.
-    // Let's sleep for NUM_SECONDS to let PortAudio play sounds for a bit.
-    // Note that pa.sleep() will sleep for *at least* NUM_SECONDS, but probably more -- don't depend
-    // on pa.sleep() for musical timings or anything like that.
-    println!("Play for {} seconds.", NUM_SECONDS);
-    pa.sleep(NUM_SECONDS * 1_000);
+    // Loop indefinitely to let audio keep playing.
+    loop {
+        thread::sleep(time::Duration::new(1, 0));
+    }
 
     // We're done playing, gracefully shut down the stream:
     try!(stream.stop());
