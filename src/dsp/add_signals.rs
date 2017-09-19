@@ -1,6 +1,6 @@
 //! Signal that takes multiple other signals and adds them together
 
-use dsp::evaluatable::Evaluatable;
+use dsp::traits::Evaluatable;
 
 /// AddSignals struct
 pub struct AddSignals {

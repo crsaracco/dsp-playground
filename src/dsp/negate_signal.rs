@@ -1,6 +1,6 @@
 //! Signal that negates the passed-in signal argument
 
-use dsp::evaluatable::Evaluatable;
+use dsp::traits::Evaluatable;
 
 /// NegateSignal struct
 pub struct NegateSignal {

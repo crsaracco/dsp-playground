@@ -1,9 +1,9 @@
 //! Parametric sine wave signal generator
 
-use dsp::evaluatable::Evaluatable;
+use dsp::traits::Evaluatable;
 use std::f64;
 
-/// Sine wave generator struct.
+/// Parametric sine wave generator struct.
 pub struct Sine<F>
     where F: Evaluatable
 {
@@ -16,7 +16,7 @@ pub struct Sine<F>
 impl<F> Sine<F>
     where F: Evaluatable
 {
-    /// Creates a new Sine wave signal generator.
+    /// Creates a new parametric sine wave signal generator.
     pub fn new(sample_rate: f64, frequency: F, amplitude: f64) -> Sine<F> {
         Sine { sample_rate, frequency, amplitude, phase: 0.0}
     }

@@ -10,7 +10,7 @@
 //! In the frequency domain, a sine wave represents a "pure tone". It consists of only one
 //! frequency: the frequency of the sine wave itself.
 
-use dsp::evaluatable::Evaluatable;
+use dsp::traits::Evaluatable;
 use std::f64;
 
 /// Sine wave generator struct.

@@ -19,7 +19,9 @@ pub mod dsp;
 use dsp::generators;
 use dsp::negate_signal::NegateSignal;
 use dsp::add_signals::AddSignals;
-use dsp::evaluatable::Evaluatable;
+
+// Traits:
+use dsp::traits::Evaluatable;
 
 
 // Constants:

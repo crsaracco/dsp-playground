@@ -24,7 +24,7 @@
 //! time domain, which does not take into account the Nyquist frequency and does not band-limit
 //! higher frequencies, so this implementation *might* include aliasing distortion. (???)
 
-use dsp::evaluatable::Evaluatable;
+use dsp::traits::Evaluatable;
 
 /// Saw wave generator struct.
 pub struct Saw {
