@@ -34,7 +34,7 @@ fn main() {
     let mut children = vec![];
 
     // Signal flow:
-    // (signal generators + filters + combinations) --> (portaudio) --> (grapher - first 1000 samples)
+    // (signal generators + filters + combinations) --> (portaudio) --> (grapher - first x samples)
 
     // Create a channel for (signals) --> (portaudio)
     let (send_audio, recv_audio) = chan::sync(SAMPLE_RATE as usize);
