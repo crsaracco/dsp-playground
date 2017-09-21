@@ -23,38 +23,56 @@
 
 use dsp::traits::Signal;
 
-/// Saw wave generator struct.
-pub struct Square {
-    sample_rate: f64,
-    frequency: f64,
-    amplitude: f64,
-    // TODO: rename to "phase" for consistency with other generators
-    sample_number: u64,
+/// Square wave generator struct.
+pub struct Square<A, F, O> where
+    A: Signal,
+    F: Signal,
+    O: Signal,
+{
+    sample_rate: f64,  // Sample rate (for audio playback, etc) - Should be the same throughout the whole project
+    amplitude: A,      // Amplitude of the Square wave
+    frequency: F,      // Frequency of the Square wave
+    offset: O,         // DC offset of the Square wave    (+/- y axis)
+    phase: f64,        // Phase offset of the Square wave (+/- x axis, as a percent of the whole period)
 }
 
-impl Square {
-    /// Creates a new Saw wave signal generator.
-    pub fn new(sample_rate: f64, frequency: f64, amplitude: f64) -> Square {
-        Square { sample_rate, frequency, amplitude, sample_number: 0}
+impl<A, F, O> Square<A, F, O> where
+    A: Signal,
+    F: Signal,
+    O: Signal,
+{
+    /// Creates a new Square wave signal generator.
+    pub fn new(amplitude: A, frequency: F, offset: O) -> Square<A, F, O> {
+        Square {
+            sample_rate: 44100.0,
+            amplitude,
+            frequency,
+            offset,
+            phase: 0.0,
+        }
     }
 }
 
-impl Signal for Square {
+impl<A, F, O> Signal for Square<A, F, O> where
+    A: Signal,
+    F: Signal,
+    O: Signal,
+{
     fn evaluate(&mut self) -> (f64) {
-        let mut output = if self.sample_number < (self.sample_rate / self.frequency / 2.0) as u64 {
-            -1.0
-        }
-        else {
-            1.0
+        let amplitude = self.amplitude.evaluate();
+        let frequency = self.frequency.evaluate();
+        let offset = self.offset.evaluate();
+
+        let mut output = match self.phase {
+            n if n <= 0.5 => -1.0,
+            _ => 1.0,
         };
 
-        self.sample_number += 1;
-        // TODO: correct?
-        if self.sample_number >= (self.sample_rate / self.frequency) as u64 {
-            self.sample_number = 0;
-        }
+        self.phase = (self.phase + frequency / self.sample_rate).fract();
 
-        output *= self.amplitude;
+        output *= amplitude;
+        output += offset;
+
         output
     }
 }

@@ -33,10 +33,10 @@ pub struct Saw<A, F, O> where
     O: Signal,
 {
     sample_rate: f64,  // Sample rate (for audio playback, etc) - Should be the same throughout the whole project
-    amplitude: A,      // Amplitude of the Sine wave
-    frequency: F,      // Frequency of the Sine wave
-    offset: O,         // DC offset of the Sine wave    (+/- y axis)
-    phase: f64,        // Phase offset of the Sine wave (+/- x axis, as a percent of the whole period)
+    amplitude: A,      // Amplitude of the Saw wave
+    frequency: F,      // Frequency of the Saw wave
+    offset: O,         // DC offset of the Saw wave    (+/- y axis)
+    phase: f64,        // Phase offset of the Saw wave (+/- x axis, as a percent of the whole period)
 }
 
 impl<A, F, O> Saw<A, F, O> where
@@ -72,8 +72,6 @@ impl<A, F, O> Signal for Saw<A, F, O> where
 
         output *= amplitude;
         output += offset;
-
-        //println!("{}", output);
 
         output
     }

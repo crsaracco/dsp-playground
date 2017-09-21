@@ -48,8 +48,8 @@ fn main() {
     // signal generators:
     children.push(thread::spawn(move || {
         // A-Minor chord
-        let sine_generator1 = generators::Sine::new(100.0, 5.0, 1000.0);
-        let sine_generator2 = generators::Saw::new(0.3, sine_generator1, 0.0);
+        let sine_generator1 = generators::Saw::new(-0.5, 2.0, 0.5);
+        let sine_generator2 = generators::Sine::new(sine_generator1, 120.0, 0.0);
 
         //let sine_generator2 = generators::Sine::new(SAMPLE_RATE, FREQUENCY * 1.2 * 0.5, 0.1);
         //let sine_generator3 = generators::Sine::new(SAMPLE_RATE, FREQUENCY * 1.5 * 0.5, 0.1);
