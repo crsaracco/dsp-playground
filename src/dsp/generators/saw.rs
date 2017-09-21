@@ -27,31 +27,54 @@
 use dsp::traits::Signal;
 
 /// Saw wave generator struct.
-pub struct Saw {
-    sample_rate: f64,
-    frequency: f64,
-    amplitude: f64,
-    // TODO: Rename to "phase" to reduce confusion; rename "current_output" below to "output"
-    output: f64,
+pub struct Saw<A, F, O> where
+    A: Signal,
+    F: Signal,
+    O: Signal,
+{
+    sample_rate: f64,  // Sample rate (for audio playback, etc) - Should be the same throughout the whole project
+    amplitude: A,      // Amplitude of the Sine wave
+    frequency: F,      // Frequency of the Sine wave
+    offset: O,         // DC offset of the Sine wave    (+/- y axis)
+    phase: f64,        // Phase offset of the Sine wave (+/- x axis, as a percent of the whole period)
 }
 
-impl Saw {
+impl<A, F, O> Saw<A, F, O> where
+    A: Signal,
+    F: Signal,
+    O: Signal,
+{
     /// Creates a new Saw wave signal generator.
-    pub fn new(sample_rate: f64, frequency: f64, amplitude: f64) -> Saw {
-        Saw { sample_rate, frequency, amplitude, output: 0.0}
+    pub fn new(amplitude: A, frequency: F, offset: O) -> Saw<A, F, O> {
+        Saw {
+            sample_rate: 44100.0,
+            amplitude,
+            frequency,
+            offset,
+            phase: 0.0,
+        }
     }
 }
 
-impl Signal for Saw {
+impl<A, F, O> Signal for Saw<A, F, O> where
+    A: Signal,
+    F: Signal,
+    O: Signal,
+{
     fn evaluate(&mut self) -> (f64) {
-        let mut current_output = self.output;
+        let amplitude = self.amplitude.evaluate();
+        let frequency = self.frequency.evaluate();
+        let offset = self.offset.evaluate();
 
-        self.output += self.frequency / self.sample_rate as f64;
-        if self.output >= 1.0 {
-            self.output -= 1.0;
-        }
+        let mut output = self.phase * 2.0 - 1.0;
+        let last_phase = self.phase;
+        self.phase = (self.phase + frequency / self.sample_rate).fract();
 
-        current_output *= self.amplitude;
-        current_output
+        output *= amplitude;
+        output += offset;
+
+        //println!("{}", output);
+
+        output
     }
 }
