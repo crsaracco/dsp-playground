@@ -15,3 +15,9 @@ pub trait Signal {
     /// Note that PortAudio does not accept f64s; it will downsample to f32 for output.
     fn evaluate(&mut self) -> f64;
 }
+
+impl Signal for f64 {
+    fn evaluate(&mut self) -> f64 {
+        *self
+    }
+}

@@ -14,26 +14,51 @@ use dsp::traits::Signal;
 use std::f64;
 
 /// Sine wave generator struct.
-pub struct Sine {
-    sample_rate: f64,
-    frequency: f64,
-    amplitude: f64,
-    phase: f64,
+pub struct Sine<A, F, O> where
+    A: Signal,
+    F: Signal,
+    O: Signal,
+{
+    sample_rate: f64,  // Sample rate (for audio playback, etc) - Should be the same throughout the whole project
+    amplitude: A,      // Amplitude of the Sine wave
+    frequency: F,      // Frequency of the Sine wave
+    offset: O,         // DC offset of the Sine wave    (+/- y axis)
+    phase: f64,        // Phase offset of the Sine wave (+/- x axis, as a percent of the whole period)
 }
 
-impl Sine {
+impl<A, F, O> Sine<A, F, O> where
+    A: Signal,
+    F: Signal,
+    O: Signal,
+{
     /// Creates a new Sine wave signal generator.
-    pub fn new(sample_rate: f64, frequency: f64, amplitude: f64) -> Sine {
-        Sine { sample_rate, frequency, amplitude, phase: 0.0}
+    pub fn new(amplitude: A, frequency: F, offset: O) -> Sine<A, F, O> {
+        Sine {
+            sample_rate: 44100.0,
+            amplitude,
+            frequency,
+            offset,
+            phase: 0.0,
+        }
     }
 }
 
-impl Signal for Sine {
+impl<A, F, O> Signal for Sine<A, F, O> where
+    A: Signal,
+    F: Signal,
+    O: Signal,
+{
     fn evaluate(&mut self) -> (f64) {
-        let mut output = (2.0 * f64::consts::PI * (self.phase)).sin();
-        self.phase += (self.frequency / self.sample_rate).fract();
+        let amplitude = self.amplitude.evaluate();
+        let frequency = self.frequency.evaluate();
+        let offset = self.offset.evaluate();
 
-        output *= self.amplitude;
+        let mut output = (2.0 * f64::consts::PI * (self.phase)).sin();
+        self.phase = (self.phase + frequency / self.sample_rate).fract();
+
+        output *= amplitude;
+        output += offset;
+
         output
     }
 }
