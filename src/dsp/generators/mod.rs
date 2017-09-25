@@ -11,3 +11,7 @@ pub use self::saw::Saw;
 // Square wave generator
 pub mod square;
 pub use self::square::Square;
+
+// Triangle wave generator
+pub mod triangle;
+pub use self::triangle::Triangle;

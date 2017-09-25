@@ -47,18 +47,15 @@ fn main() {
 
     // signal generators:
     children.push(thread::spawn(move || {
-        // A-Minor chord
-        let sine_generator1 = generators::Saw::new(-0.5, 2.0, 0.5);
-        let sine_generator2 = generators::Sine::new(sine_generator1, 120.0, 0.0);
+        let mut sine_generator = generators::Sine::new(100.0, 3.0, 1000.0);
+        let mut sine_generator2 = generators::Sine::default()
+            .set_amplitude_f64(0.9)
+            .set_frequency(sine_generator);
 
-        //let sine_generator2 = generators::Sine::new(SAMPLE_RATE, FREQUENCY * 1.2 * 0.5, 0.1);
-        //let sine_generator3 = generators::Sine::new(SAMPLE_RATE, FREQUENCY * 1.5 * 0.5, 0.1);
-        let add_vec: Vec<Box<Signal>> = vec![Box::new(sine_generator2)];
-        let mut add_signals = AddSignals::new(add_vec);
 
         //let mut parametric_sine_gen = generators::parametric::Sine::new(SAMPLE_RATE, add_signals, 0.3);
         loop {
-            send_audio.send(add_signals.evaluate());
+            send_audio.send(sine_generator2.evaluate());
         }
     }));
 
