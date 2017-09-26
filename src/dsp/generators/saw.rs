@@ -27,25 +27,17 @@
 use dsp::traits::Signal;
 
 /// Saw wave generator struct.
-pub struct Saw<A, F, O> where
-    A: Signal,
-    F: Signal,
-    O: Signal,
-{
+pub struct Saw {
     sample_rate: f64,  // Sample rate (for audio playback, etc) - Should be the same throughout the whole project
-    amplitude: A,      // Amplitude of the Saw wave
-    frequency: F,      // Frequency of the Saw wave
-    offset: O,         // DC offset of the Saw wave    (+/- y axis)
+    amplitude: f64,    // Amplitude of the Saw wave
+    frequency: f64,    // Frequency of the Saw wave
+    offset: f64,       // DC offset of the Saw wave    (+/- y axis)
     phase: f64,        // Phase offset of the Saw wave (+/- x axis, as a percent of the whole period)
 }
 
-impl<A, F, O> Saw<A, F, O> where
-    A: Signal,
-    F: Signal,
-    O: Signal,
-{
+impl Saw {
     /// Creates a new Saw wave signal generator.
-    pub fn new(amplitude: A, frequency: F, offset: O) -> Saw<A, F, O> {
+    pub fn new(amplitude: f64, frequency: f64, offset: f64) -> Saw {
         Saw {
             sample_rate: 44100.0,
             amplitude,
@@ -56,23 +48,16 @@ impl<A, F, O> Saw<A, F, O> where
     }
 }
 
-impl<A, F, O> Signal for Saw<A, F, O> where
-    A: Signal,
-    F: Signal,
-    O: Signal,
-{
+impl Signal for Saw {
     fn evaluate(&mut self) -> (f64) {
-        let amplitude = self.amplitude.evaluate();
-        let frequency = self.frequency.evaluate();
-        let offset = self.offset.evaluate();
-
         let mut output = self.phase * 2.0 - 1.0;
-        let last_phase = self.phase;
-        self.phase = (self.phase + frequency / self.sample_rate).fract();
+        self.phase = (self.phase + self.frequency / self.sample_rate).fract();
 
-        output *= amplitude;
-        output += offset;
+        // Transform the signal, taking into account the amplitude and DC offset
+        output *= self.amplitude;
+        output += self.offset;
 
+        // Return the output
         output
     }
 }

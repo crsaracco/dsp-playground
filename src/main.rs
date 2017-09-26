@@ -47,15 +47,10 @@ fn main() {
 
     // signal generators:
     children.push(thread::spawn(move || {
-        let mut sine_generator = generators::Sine::new(100.0, 3.0, 1000.0);
-        let mut sine_generator2 = generators::Sine::default()
-            .set_amplitude_f64(0.9)
-            .set_frequency(sine_generator);
+        let mut some_generator = generators::Triangle::new(0.8, 500.0, 0.0);
 
-
-        //let mut parametric_sine_gen = generators::parametric::Sine::new(SAMPLE_RATE, add_signals, 0.3);
         loop {
-            send_audio.send(sine_generator2.evaluate());
+            send_audio.send(some_generator.evaluate());
         }
     }));
 

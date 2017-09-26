@@ -11,3 +11,4 @@ Cargo.lock
 
 # Ignore CLion / IDEA files
 .idea/
+cmake-build-debug/

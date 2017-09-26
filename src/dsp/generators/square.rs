@@ -24,25 +24,17 @@
 use dsp::traits::Signal;
 
 /// Square wave generator struct.
-pub struct Square<A, F, O> where
-    A: Signal,
-    F: Signal,
-    O: Signal,
-{
+pub struct Square {
     sample_rate: f64,  // Sample rate (for audio playback, etc) - Should be the same throughout the whole project
-    amplitude: A,      // Amplitude of the Square wave
-    frequency: F,      // Frequency of the Square wave
-    offset: O,         // DC offset of the Square wave    (+/- y axis)
+    amplitude: f64,    // Amplitude of the Square wave
+    frequency: f64,    // Frequency of the Square wave
+    offset: f64,       // DC offset of the Square wave    (+/- y axis)
     phase: f64,        // Phase offset of the Square wave (+/- x axis, as a percent of the whole period)
 }
 
-impl<A, F, O> Square<A, F, O> where
-    A: Signal,
-    F: Signal,
-    O: Signal,
-{
+impl Square {
     /// Creates a new Square wave signal generator.
-    pub fn new(amplitude: A, frequency: F, offset: O) -> Square<A, F, O> {
+    pub fn new(amplitude: f64, frequency: f64, offset: f64) -> Square {
         Square {
             sample_rate: 44100.0,
             amplitude,
@@ -53,26 +45,19 @@ impl<A, F, O> Square<A, F, O> where
     }
 }
 
-impl<A, F, O> Signal for Square<A, F, O> where
-    A: Signal,
-    F: Signal,
-    O: Signal,
-{
+impl Signal for Square {
     fn evaluate(&mut self) -> (f64) {
-        let amplitude = self.amplitude.evaluate();
-        let frequency = self.frequency.evaluate();
-        let offset = self.offset.evaluate();
-
         let mut output = match self.phase {
             n if n <= 0.5 => -1.0,
             _ => 1.0,
         };
+        self.phase = (self.phase + self.frequency / self.sample_rate).fract();
 
-        self.phase = (self.phase + frequency / self.sample_rate).fract();
+        // Transform the signal, taking into account the amplitude and DC offset
+        output *= self.amplitude;
+        output += self.offset;
 
-        output *= amplitude;
-        output += offset;
-
+        // Return the output
         output
     }
 }
