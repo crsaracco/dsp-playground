@@ -6,3 +6,4 @@ authors = ["Charles Saracco <crsaracco@gmail.com>"]
 [dependencies]
 portaudio = "*"
 chan = "*"
+gnuplot = "*"
