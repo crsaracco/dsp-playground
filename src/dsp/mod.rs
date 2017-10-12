@@ -11,3 +11,4 @@ pub mod generators;
 pub mod traits;
 pub mod add_signals;
 pub mod negate_signal;
+pub mod dft;

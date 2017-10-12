@@ -10,11 +10,14 @@ use std::{thread, time};
 const NUM_CHANNELS: i32 = 2;
 const FRAMES_PER_BUFFER: u32 = 1024;
 const BUFFER_SECONDS: f64 = 0.100;  // Buffer samples for 100ms -- reduces chances of underrun
-use SAMPLE_RATE;
+use audio_playground::SAMPLE_RATE;
 
 /// "Run" the audio thread
 /// Probably want to run this in a separate thread and send samples over a channel.
 pub fn run(recv_audio: chan::Receiver<f64>, send_points: chan::Sender<f64>) -> Result<(), pa::Error> {
+    // Sleep a little so we don't underrun our audio buffer (probably not even needed but whatever):
+    thread::sleep(time::Duration::new(0, 100_000));
+
     // Fire up ye olde PortAudio:
     println!("=============");
     let pa = try!(pa::PortAudio::new());
@@ -54,7 +57,10 @@ pub fn run(recv_audio: chan::Receiver<f64>, send_points: chan::Sender<f64>) -> R
     try!(stream.start());
 
     // We're using PortAudio in non-blocking mode, so execution will fall through immedately.
-    thread::sleep(time::Duration::new(1, 0));
+    // Sleep to make sure we keep playing audio
+    loop {
+        thread::sleep(time::Duration::new(1, 0));
+    }
 
     // We're done playing, gracefully shut down the stream:
     try!(stream.stop());
