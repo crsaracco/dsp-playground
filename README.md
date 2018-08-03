@@ -1,2 +1,2 @@
 # dsp-playground
-Messing around with DSP-related topics in Rust
+Experimenting with DSP-related topics in Rust
